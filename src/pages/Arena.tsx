@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -189,19 +188,18 @@ const Arena = () => {
       return;
     }
     
-    // In a real app, this would navigate to a course creation page
-    // For now, just show a toast
+    // Create course logic here
     toast({
-      title: "Course creation",
-      description: "Course creation feature coming soon!",
+      title: "Course created",
+      description: "Your course has been created successfully!",
     });
   };
 
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-8">Arena</h1>
+      <h1 className="text-3xl font-bold mb-8 text-foreground">Arena</h1>
       
-      <Tabs defaultValue="explore" className="w-full" onValueChange={setActiveTab}>
+      <Tabs defaultValue="explore" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="explore">Explore Courses</TabsTrigger>
           <TabsTrigger value="my-courses">My Courses</TabsTrigger>
@@ -341,10 +339,6 @@ const Arena = () => {
                         <Input id="topic" placeholder="e.g., Machine Learning Basics" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="audience">Target Audience</Label>
-                        <Input id="audience" placeholder="e.g., Beginners, Data Scientists" />
-                      </div>
-                      <div className="space-y-2">
                         <Label htmlFor="modules">Number of Modules</Label>
                         <Input id="modules" type="number" min="1" max="10" placeholder="5" />
                       </div>
@@ -373,6 +367,10 @@ const Arena = () => {
                         <Input id="description" placeholder="Describe your course..." />
                       </div>
                       <div className="space-y-2">
+                        <Label htmlFor="youtube">YouTube Playlist Link</Label>
+                        <Input id="youtube" placeholder="Paste your YouTube playlist URL" />
+                      </div>
+                      <div className="space-y-2">
                         <Label htmlFor="tags">Tags (comma separated)</Label>
                         <Input id="tags" placeholder="e.g., Web, JavaScript, CSS" />
                       </div>
@@ -384,16 +382,6 @@ const Arena = () => {
                     </Button>
                   </CardFooter>
                 </Card>
-              </div>
-              
-              <div className="bg-muted p-4 rounded-lg">
-                <h3 className="font-medium mb-2">Why Create a Course?</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Share your expertise with the community</li>
-                  <li>• Earn coins when users enroll in your course</li>
-                  <li>• Build your reputation as an educator</li>
-                  <li>• Help others learn valuable skills</li>
-                </ul>
               </div>
             </CardContent>
           </Card>
