@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/blog" element={<Tribe />} /> {/* Reusing Tribe component for Blog temporarily */}
             </Routes>
           </main>
           <Footer />

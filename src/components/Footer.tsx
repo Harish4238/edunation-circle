@@ -35,6 +35,11 @@ const Footer = () => {
                   Tribe
                 </Link>
               </li>
+              <li>
+                <Link to="/blog" className="text-gray-600 dark:text-gray-400 hover:text-primary">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
           

@@ -5,6 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Calendar } from '@/components/ui/calendar';
+import { Award, Quote } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface User {
@@ -14,6 +16,7 @@ interface User {
   streak: number;
   enrolledCourses: Course[];
   completedCourses: Course[];
+  loginDays?: Date[];
 }
 
 interface Course {
@@ -25,9 +28,21 @@ interface Course {
   tags: string[];
 }
 
+// Daily quotes array
+const quotes = [
+  { quote: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { quote: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" },
+  { quote: "The beautiful thing about learning is that nobody can take it away from you.", author: "B.B. King" },
+  { quote: "Live as if you were to die tomorrow. Learn as if you were to live forever.", author: "Mahatma Gandhi" },
+  { quote: "Learning never exhausts the mind.", author: "Leonardo da Vinci" },
+  { quote: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.", author: "Dr. Seuss" },
+  { quote: "Knowledge is power. Information is liberating. Education is the premise of progress.", author: "Kofi Annan" }
+];
+
 const Odyssey = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dailyQuote, setDailyQuote] = useState({ quote: "", author: "" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -68,6 +83,69 @@ const Odyssey = () => {
     });
   };
 
+  // Get a random quote
+  const getRandomQuote = () => {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
+  };
+
+  // Record today's login
+  const recordLogin = (userData: User) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+    
+    const loginDays = userData.loginDays || [];
+    
+    // Check if today is already recorded
+    const alreadyLoggedToday = loginDays.some(date => {
+      const d = new Date(date);
+      return d.toDateString() === today.toDateString();
+    });
+    
+    if (!alreadyLoggedToday) {
+      const newLoginDays = [...loginDays, today];
+      
+      // Check for consecutive days to update streak
+      let streak = 1;
+      const sortedDays = newLoginDays.map(d => new Date(d)).sort((a, b) => b.getTime() - a.getTime());
+      
+      for (let i = 0; i < sortedDays.length - 1; i++) {
+        const current = new Date(sortedDays[i]);
+        const prev = new Date(sortedDays[i + 1]);
+        
+        // Check if dates are consecutive
+        const diffTime = Math.abs(current.getTime() - prev.getTime());
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      
+      // If streak reaches 30 days, show special badge
+      if (streak === 30 && userData.streak < 30) {
+        toast({
+          title: "Achievement Unlocked!",
+          description: "You've earned the One Month Streak badge! 🏆",
+        });
+        triggerConfetti();
+      }
+      
+      const updatedUser = {
+        ...userData,
+        loginDays: newLoginDays,
+        streak: Math.max(userData.streak, streak)
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
+    }
+    
+    return userData;
+  };
+
   useEffect(() => {
     // Check if user is logged in
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -80,12 +158,15 @@ const Odyssey = () => {
     const userData = localStorage.getItem('user');
     if (userData) {
       const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
+      const updatedUser = recordLogin(parsedUser);
+      setUser(updatedUser);
       
       // Trigger welcome confetti for demonstration
       setTimeout(triggerConfetti, 1000);
     }
     
+    // Set daily quote
+    setDailyQuote(getRandomQuote());
     setIsLoading(false);
   }, [navigate]);
   
@@ -122,14 +203,26 @@ const Odyssey = () => {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
+  // Prepare the calendar disabled dates (days user hasn't logged in)
+  const loginDays = user?.loginDays?.map(date => new Date(date)) || [];
+
+  // Function to determine if user has 30-day streak badge
+  const hasMonthStreakBadge = (user?.streak || 0) >= 30;
+
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      {/* Welcome Banner */}
+      {/* Welcome Banner with Quote */}
       <div className="bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-lg rounded-xl p-6 mb-8 shadow-lg border border-white/10 animate-fade-in">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Welcome, {user?.username || 'Learner'}!</h1>
-            <p className="text-muted-foreground mt-2">Continue your learning journey</p>
+            <div className="mt-2 flex items-start">
+              <Quote className="h-5 w-5 mr-2 mt-1 text-primary" />
+              <div>
+                <p className="text-muted-foreground italic">"{dailyQuote.quote}"</p>
+                <p className="text-sm text-muted-foreground mt-1">- {dailyQuote.author}</p>
+              </div>
+            </div>
           </div>
           <div className="flex flex-col items-end mt-4 md:mt-0">
             <div className="flex items-center gap-2 mb-2">
@@ -139,6 +232,12 @@ const Odyssey = () => {
             <div className="flex items-center gap-2">
               <div className="text-xl font-bold">{user?.rank || 'Beginner'}</div>
               <div className="text-sm text-muted-foreground">Rank</div>
+              {hasMonthStreakBadge && (
+                <div className="ml-2 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-100 text-xs px-2 py-1 rounded-full flex items-center">
+                  <Award className="h-3 w-3 mr-1" />
+                  <span>30-Day Streak</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -183,6 +282,28 @@ const Odyssey = () => {
                       {day}
                     </div>
                   ))}
+                </div>
+              </div>
+              
+              {/* Login Calendar */}
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span>Login Calendar</span>
+                </div>
+                <Calendar 
+                  mode="multiple"
+                  selected={loginDays}
+                  className="border rounded-md"
+                  disabled={{ before: new Date(2023, 0, 1) }}
+                  modifiers={{
+                    active: loginDays
+                  }}
+                  modifiersClassNames={{
+                    active: "bg-primary text-primary-foreground"
+                  }}
+                />
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Highlighted dates show your login activity
                 </div>
               </div>
             </CardContent>
