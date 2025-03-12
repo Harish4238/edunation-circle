@@ -1,12 +1,121 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [isSigningUp, setIsSigningUp] = useState(false);
+
+  const features = [
+    {
+      title: "AI-Powered Learning",
+      description: "Generate personalized courses using advanced AI technology"
+    },
+    {
+      title: "Interactive Community",
+      description: "Learn together with a vibrant community of learners"
+    },
+    {
+      title: "Gamified Experience",
+      description: "Earn coins and ranks as you progress in your learning journey"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Web Developer",
+      content: "VSkill Arena transformed how I learn new technologies. The AI-generated courses are incredibly helpful!"
+    },
+    {
+      name: "Michael Chen",
+      role: "Data Scientist",
+      content: "The community features and gamification make learning engaging and fun. Great platform!"
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6">
+              Welcome to VSkill Arena
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+              Transform your learning journey with AI-powered courses and an engaging community
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button
+                size="lg"
+                onClick={() => navigate('/signup')}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Get Started
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/login')}
+              >
+                Log In
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+            Key Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-lg border border-gray-200 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+            What Our Users Say
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-lg border border-gray-200 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle>{testimonial.name}</CardTitle>
+                  <CardDescription>{testimonial.role}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 dark:text-gray-300">{testimonial.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
