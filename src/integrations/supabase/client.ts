@@ -10,6 +10,12 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // import { supabase } from "@/integrations/supabase/client";
 
 export type Tables = Database['public']['Tables'];
-export type UserActivity = Tables['user_activities']['Row'];
+export type UserActivity = {
+  id: string;
+  user_id: string;
+  activity_type: string;
+  activity_data: any;
+  created_at: string;
+};
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);

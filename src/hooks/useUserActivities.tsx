@@ -32,6 +32,7 @@ export const useUserActivities = () => {
       const { data, error: fetchError } = await supabase
         .from('user_activities')
         .select('*')
+        .eq('user_id', userData.user.id)
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
