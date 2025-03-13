@@ -15,6 +15,7 @@ import Tribe from "./pages/Tribe";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import { ActivityProvider } from "./contexts/ActivityContext";
 
 const queryClient = new QueryClient();
 
@@ -25,22 +26,24 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/odyssey" element={<Odyssey />} />
-              <Route path="/arena" element={<Arena />} />
-              <Route path="/tribe" element={<Tribe />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/blog" element={<Tribe />} /> {/* Reusing Tribe component for Blog temporarily */}
-            </Routes>
-          </main>
-          <Footer />
+          <ActivityProvider>
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/odyssey" element={<Odyssey />} />
+                <Route path="/arena" element={<Arena />} />
+                <Route path="/tribe" element={<Tribe />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="*" element={<NotFound />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/blog" element={<Tribe />} /> {/* Reusing Tribe component for Blog temporarily */}
+              </Routes>
+            </main>
+            <Footer />
+          </ActivityProvider>
         </BrowserRouter>
       </div>
     </TooltipProvider>

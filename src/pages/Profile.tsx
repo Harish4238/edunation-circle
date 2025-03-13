@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Camera, Edit2, Award } from 'lucide-react';
+import ActivityFeed from '@/components/ActivityFeed';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useActivity } from '@/contexts/ActivityContext';
 
 interface User {
   username: string;
@@ -25,8 +28,11 @@ const Profile = () => {
   const [fileInputKey, setFileInputKey] = useState(Date.now());
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { trackPageVisit } = useActivity();
 
   useEffect(() => {
+    trackPageVisit('Profile Page');
+    
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
@@ -34,7 +40,7 @@ const Profile = () => {
     } else {
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, trackPageVisit]);
 
   const handleUpdateProfile = () => {
     if (!user) return;
@@ -196,76 +202,95 @@ const Profile = () => {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-8">
-        {/* Achievements Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Achievements</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {achievements.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {achievements.map((achievement) => (
-                  <Card key={achievement.id} className="hover-scale overflow-hidden">
-                    <div className="flex flex-col items-center p-4">
-                      <div className="bg-muted rounded-full p-3 mb-3">
-                        {achievement.icon}
-                      </div>
-                      <h3 className="font-semibold text-center">{achievement.title}</h3>
-                      <p className="text-sm text-muted-foreground text-center mt-1">
-                        {achievement.description}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No achievements unlocked yet.</p>
-                <p className="mt-2">Keep learning to earn badges!</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Enrolled Courses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {user.enrolledCourses && user.enrolledCourses.length > 0 ? (
-              <div className="space-y-4">
-                {user.enrolledCourses.map((course) => (
-                  <div key={course.id} className="space-y-2">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">{course.title}</h3>
-                      <span>{Math.round(course.progress)}%</span>
-                    </div>
-                    <Progress value={course.progress} className="h-2" />
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate(`/arena?course=${course.id}`)}
-                    >
-                      Resume Course
-                    </Button>
+      <Tabs defaultValue="overview" className="mb-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity History</TabsTrigger>
+          <TabsTrigger value="courses">Courses</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          <div className="grid gap-8">
+            {/* Achievements Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Achievements</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {achievements.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {achievements.map((achievement) => (
+                      <Card key={achievement.id} className="hover-scale overflow-hidden">
+                        <div className="flex flex-col items-center p-4">
+                          <div className="bg-muted rounded-full p-3 mb-3">
+                            {achievement.icon}
+                          </div>
+                          <h3 className="font-semibold text-center">{achievement.title}</h3>
+                          <p className="text-sm text-muted-foreground text-center mt-1">
+                            {achievement.description}
+                          </p>
+                        </div>
+                      </Card>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>You haven't enrolled in any courses yet.</p>
-                <Button
-                  variant="link"
-                  onClick={() => navigate('/arena')}
-                  className="mt-2"
-                >
-                  Explore courses
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No achievements unlocked yet.</p>
+                    <p className="mt-2">Keep learning to earn badges!</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <ActivityFeed limit={5} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <ActivityFeed showTitle={false} />
+        </TabsContent>
+
+        <TabsContent value="courses">
+          <Card>
+            <CardHeader>
+              <CardTitle>Enrolled Courses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {user.enrolledCourses && user.enrolledCourses.length > 0 ? (
+                <div className="space-y-4">
+                  {user.enrolledCourses.map((course) => (
+                    <div key={course.id} className="space-y-2">
+                      <div className="flex justify-between">
+                        <h3 className="font-medium">{course.title}</h3>
+                        <span>{Math.round(course.progress)}%</span>
+                      </div>
+                      <Progress value={course.progress} className="h-2" />
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate(`/arena?course=${course.id}`)}
+                      >
+                        Resume Course
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>You haven't enrolled in any courses yet.</p>
+                  <Button
+                    variant="link"
+                    onClick={() => navigate('/arena')}
+                    className="mt-2"
+                  >
+                    Explore courses
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

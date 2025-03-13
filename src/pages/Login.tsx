@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useActivity } from '@/contexts/ActivityContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -14,6 +16,12 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { recordActivity, trackPageVisit } = useActivity();
+
+  // Track page visit when component mounts
+  useEffect(() => {
+    trackPageVisit('Login Page');
+  }, [trackPageVisit]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +56,13 @@ const Login = () => {
         
         // Set session
         localStorage.setItem('isLoggedIn', 'true');
+        
+        // Record login activity
+        await recordActivity('login', { 
+          username: username,
+          method: 'username',
+          device: navigator.userAgent
+        });
         
         // Show success toast
         toast({
